@@ -1,19 +1,19 @@
 ﻿using Castle.DynamicProxy;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace SignalRClient
+namespace SignalRProxy
 {
-    public static class SignalRClientGenerator
+    public static class SignalRProxyGenerator
     {
         private static readonly ProxyGenerator generator = new ProxyGenerator();
 
-        public static TClient CreateClient<TClient>(HubConnection connection)
+        public static TClient CreateProxy<TClient>(HubConnection connection)
             where TClient : class
         {
-            return CreateClient<TClient>(new HubConnectionAdapter(connection));
+            return CreateProxy<TClient>(new HubConnectionAdapter(connection));
         }
 
-        public static TClient CreateClient<TClient>(IHubConnection connection)
+        public static TClient CreateProxy<TClient>(IHubConnection connection)
             where TClient : class
         {
             var interceptor = new SignalRInterceptor(connection);

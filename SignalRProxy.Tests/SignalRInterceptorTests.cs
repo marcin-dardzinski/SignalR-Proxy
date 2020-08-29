@@ -4,7 +4,7 @@ using Castle.DynamicProxy;
 using NSubstitute;
 using Xunit;
 
-namespace SignalRClient.Tests
+namespace SignalRProxy.Tests
 {
     public class SignalRInterceptorTests
     {

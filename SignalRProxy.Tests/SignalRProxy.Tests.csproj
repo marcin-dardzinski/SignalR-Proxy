@@ -4,7 +4,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../SignalRClient/SignalRClient.csproj"/>
+    <ProjectReference Include="../SignalRProxy/SignalRProxy.csproj"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>

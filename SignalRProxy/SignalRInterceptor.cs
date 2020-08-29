@@ -1,7 +1,7 @@
 ﻿using Castle.DynamicProxy;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace SignalRClient
+namespace SignalRProxy
 {
     public class SignalRInterceptor : IInterceptor
     {

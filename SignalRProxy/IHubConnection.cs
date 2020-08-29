@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace SignalRClient
+namespace SignalRProxy
 {
     public interface IHubConnection
     {
