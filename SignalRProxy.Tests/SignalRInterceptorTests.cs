@@ -25,12 +25,7 @@ namespace SignalRProxy.Tests
 
             await proxy.ServerMethod(1, 2);
 
-            await connection.Received().SendAsync(nameof(ISimpleServerClient.ServerMethod), IsArray(1, 2));
-        }
-
-        static ref object[] IsArray(params object[] expected)
-        {
-            return ref Arg.Is<object[]>(actual => actual.SequenceEqual(expected));
+            await connection.Received().SendAsync(nameof(ISimpleServerClient.ServerMethod), Helpers.IsArrayArg<object>(1, 2));
         }
     }
 

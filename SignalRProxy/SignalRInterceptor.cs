@@ -1,5 +1,4 @@
 ﻿using Castle.DynamicProxy;
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace SignalRProxy
 {
