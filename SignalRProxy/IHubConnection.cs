@@ -10,6 +10,7 @@ namespace SignalRProxy
         HubConnection TargetConnection { get; }
 
         Task SendAsync(string methodName, object[] args, CancellationToken cancellationToken = default);
+        Task<object> InvokeAsync(string methodName, object[] args, Type returnType, CancellationToken cancellation = default);
 
         IDisposable On(string methodName, Type[] args, Func<object[], object?, Task> handler, object? state);
     }
@@ -26,6 +27,11 @@ namespace SignalRProxy
         public Task SendAsync(string methodName, object[] args, CancellationToken cancellationToken = default)
         {
             return TargetConnection.SendCoreAsync(methodName, args, cancellationToken);
+        }
+
+        public Task<object> InvokeAsync(string methodName, object[] args, Type returnType, CancellationToken cancellationToken = default)
+        {
+            return TargetConnection.InvokeCoreAsync(methodName, returnType, args, cancellationToken);
         }
 
         public IDisposable On(string methodName, Type[] args, Func<object[], object?, Task> handler, object? state)

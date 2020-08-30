@@ -8,7 +8,7 @@ namespace SignalRProxy
         IDisposable Subscribe(object handler, Type handlerType);
     }
 
-    public class HubProxy<THubClient>
+    public class HubProxy<THubClient> : IHubProxy
         where THubClient : class
     {
         private readonly IHubConnection connection;
