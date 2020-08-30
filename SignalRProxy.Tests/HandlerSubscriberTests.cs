@@ -17,42 +17,59 @@ namespace SignalRProxy.Tests
         }
 
         [Fact]
-        public void Subscribes_to_all_methods_of_the_interface()
+        public void Subscribes_to_all_methods_of_the_interface_both_sync_and_async()
         {
-            var handler = new ServerImpl();
+            var handler = Substitute.For<IHandler>();
 
-            subscriber.Subscribe(handler, typeof(IServer), connection);
+            subscriber.Subscribe(handler, typeof(IHandler), connection);
 
             connection.Received().On(
                 nameof(handler.A),
                 Helpers.IsArrayArg(typeof(int), typeof(string)),
-                Arg.Any<Func<object[], object?, Task>>(),
+                HandlerSubscriber.AsyncHandler,
                 Arg.Is<HandlerState>(st => st.Handler == handler && st.Method.Name == nameof(handler.A)));
 
             connection.Received().On(
                 nameof(handler.B),
-                Helpers.IsArrayArg<Type>(),
-                Arg.Any<Func<object[], object?, Task>>(),
+                Helpers.IsArrayArg(typeof(int)),
+                HandlerSubscriber.SyncHandler,
                 Arg.Is<HandlerState>(st => st.Handler == handler && st.Method.Name == nameof(handler.B)));
         }
 
-        interface IServer
+        [Fact]
+        public async Task Async_handler_correctly_calls_handler_method()
         {
-            Task A(int x, string y);
-            Task B();
+            var method = typeof(IHandler).GetMethod("A")!;
+            var handler = Substitute.For<IHandler>();
+
+            var state = new HandlerState(method, handler);
+            var args = new object[] { 1, "s" };
+
+            await HandlerSubscriber.AsyncHandler(args, state);
+
+            await handler.Received()
+                .A(1, "s");
         }
 
-        class ServerImpl : IServer
+        [Fact]
+        public async Task Sync_handler_correctly_calls_handler_method_and_wraps_with_completed_task()
         {
-            public Task A(int x, string y)
-            {
-                throw new System.NotImplementedException();
-            }
+            var method = typeof(IHandler).GetMethod("B")!;
+            var handler = Substitute.For<IHandler>();
 
-            public Task B()
-            {
-                throw new System.NotImplementedException();
-            }
+            var state = new HandlerState(method, handler);
+            var args = new object[] { 1 };
+
+            await HandlerSubscriber.SyncHandler(args, state);
+
+            handler.Received()
+                .B(1);
+        }
+
+        public interface IHandler
+        {
+            Task A(int x, string y);
+            void B(int x);
         }
     }
 }

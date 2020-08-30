@@ -19,17 +19,48 @@ namespace SignalRProxy
 
             foreach (var method in handlerType.GetMethods())
             {
-                var args = method.GetParameters().Select(p => p.ParameterType).ToArray();
-                var state = new HandlerState(method, handler);
-
-                var sub = connection.On(method.Name, args, Handler, state);
+                var sub = Subscribe(handler, method, connection);
                 subs.Add(sub);
             }
 
             return new BatchedDisposable(subs);
         }
 
-        private static Task Handler(object[] args, object? state)
+        private IDisposable Subscribe(object handler, MethodInfo method, IHubConnection connection)
+        {
+            var args = method.GetParameters().Select(p => p.ParameterType).ToArray();
+            var state = new HandlerState(method, handler);
+            var handlerFunc = HandlerForMethod(method);
+
+            return connection.On(method.Name, args, handlerFunc, state);
+        }
+
+        private Func<object[], object?, Task> HandlerForMethod(MethodInfo method)
+        {
+            if (method.ReturnType == typeof(void))
+            {
+                return SyncHandler;
+            }
+            else if (method.ReturnType == typeof(Task))
+            {
+                return AsyncHandler;
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Unexpected return type parameter: `{method.ReturnType}` for event handler method: {method.Name}. It must be void or non generic Task");
+            }
+        }
+
+        internal static Task SyncHandler(object[] args, object? state)
+        {
+            var handler = (HandlerState)state!;
+            handler.Method.Invoke(handler.Handler, args);
+
+            return Task.CompletedTask;
+        }
+
+        internal static Task AsyncHandler(object[] args, object? state)
         {
             var handler = (HandlerState)state!;
             return (Task)handler.Method.Invoke(handler.Handler, args);
