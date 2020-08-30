@@ -53,6 +53,8 @@ namespace SignalRProxy
 
         private static async Task<TResult> Cast<TResult>(Task<object> task)
         {
+            // The obtained Task<object> cannot be directly converted to generic Task<TResult>.
+            // We have to await it and cast explicitly.
             var res = await task;
             return res != null ? (TResult)res : default!;
         }
